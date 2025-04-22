@@ -60,6 +60,7 @@ void ContentControl::resetContent() {
     }
     paths.resPaths = ResPaths(resRoots);
     content.reset();
+    scripting::on_content_reset();
 
     contentPacks.clear();
     contentPacks = manager->getAll(basePacks);

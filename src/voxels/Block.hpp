@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <optional>
 #include <string>
 #include <vector>
 #include <array>
@@ -10,6 +9,8 @@
 #include "maths/UVRegion.hpp"
 #include "maths/aabb.hpp"
 #include "typedefs.hpp"
+#include "util/EnumMetadata.hpp"
+#include "interfaces/Serializable.hpp"
 
 struct ParticlesPreset;
 
@@ -93,8 +94,13 @@ enum class BlockModel {
     custom
 };
 
-std::string to_string(BlockModel model);
-std::optional<BlockModel> BlockModel_from(std::string_view str);
+VC_ENUM_METADATA(BlockModel)
+    {"none", BlockModel::none},
+    {"block", BlockModel::block},
+    {"X", BlockModel::xsprite},
+    {"aabb", BlockModel::aabb},
+    {"custom", BlockModel::custom},
+VC_ENUM_END
 
 enum class CullingMode {
     DEFAULT,
@@ -102,20 +108,25 @@ enum class CullingMode {
     DISABLED,
 };
 
-std::string to_string(CullingMode mode);
-std::optional<CullingMode> CullingMode_from(std::string_view str);
+VC_ENUM_METADATA(CullingMode)
+    {"default", CullingMode::DEFAULT},
+    {"optional", CullingMode::OPTIONAL},
+    {"disabled", CullingMode::DISABLED},
+VC_ENUM_END
 
 using BoxModel = AABB;
 
 /// @brief Common kit of block properties applied to groups of blocks
-struct BlockMaterial {
+struct BlockMaterial : Serializable {
     std::string name;
     std::string stepsSound;
     std::string placeSound;
     std::string breakSound;
     std::string hitSound;
 
-    dv::value serialize() const;
+    dv::value toTable() const; // for compatibility
+    dv::value serialize() const override;
+    void deserialize(const dv::value& src) override;
 };
 
 /// @brief Block properties definition
